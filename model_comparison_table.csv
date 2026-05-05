@@ -1,0 +1,6 @@
+Experiment,Hidden Layers,Activation,Learning Rate,Batch Size,Max Epochs,Epochs Run,Train Accuracy,Test Accuracy,Test Loss,Precision (Churn),Recall (Churn),F1-Score (Churn),AUC-ROC,TN,FP,FN,TP
+Exp 1 - Baseline,"(64, 32)",relu,0.001,32,100,81,1.0,0.975,0.192,0.0,0.0,0.0,0.7394,390,4,6,0
+Exp 2 - Deeper Network,"(128, 64, 32)",relu,0.001,32,100,43,1.0,0.98,0.1728,0.25,0.1667,0.2,0.7906,391,3,5,1
+Exp 3 - Higher LR + Tanh,"(64, 32)",tanh,0.01,32,100,66,0.9994,0.98,0.1303,0.0,0.0,0.0,0.8536,392,2,6,0
+Exp 4 - Small Batch + More Neurons,"(128, 64)",relu,0.001,16,200,47,1.0,0.9875,0.196,1.0,0.1667,0.2857,0.7538,394,0,5,1
+Exp 5 - Lower LR + Deeper,"(64, 32, 16)",relu,0.0001,64,200,200,0.9856,0.985,0.0703,0.0,0.0,0.0,0.8448,394,0,6,0

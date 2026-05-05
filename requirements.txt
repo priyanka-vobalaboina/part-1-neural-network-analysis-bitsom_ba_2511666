@@ -1,0 +1,81 @@
+Task 6: Final Reflection
+1. What role do weights and biases play in the model?
+Weights are the numerical values that determine how strongly each input feature influences the next layer's neurons. Think of them as "importance scores" — a higher weight means that feature has more influence on the prediction. For example, if the weight connecting payment_delay_days to a hidden neuron is large, it means payment delays strongly affect the churn prediction.
+
+Biases are extra values added to each neuron that allow the model to shift its output. Without biases, every neuron's output would have to pass through the origin (0,0), which limits what the network can learn. Biases give the model flexibility — like adjusting the "baseline" of each neuron.
+
+Together, they form the equation at each neuron:
+
+output = activation(w₁x₁ + w₂x₂ + ... + wₙxₙ + bias)
+In our model, there are 3,713 trainable parameters (3,616 weights + 97 biases) that the network learns during training through backpropagation. Initially they start as random values, and gradually get adjusted to minimize the loss function.
+
+2. Why is an activation function required?
+Without activation functions, a neural network would just be a series of linear transformations stacked together — which mathematically simplifies to a single linear equation. No matter how many layers we add, the output would still be a linear combination of inputs. This means the network couldn't learn complex, non-linear patterns like "customers who have high payment delays AND low satisfaction AND short tenure are likely to churn."
+
+Activation functions introduce non-linearity, allowing the network to learn curved decision boundaries and complex relationships.
+
+In our model:
+
+ReLU (hidden layers): f(x) = max(0, x) — passes positive values through and blocks negatives. It's fast, avoids the vanishing gradient problem, and works well in practice.
+Sigmoid (output layer): σ(x) = 1/(1+e⁻ˣ) — squashes the output between 0 and 1, which we interpret as the probability of churn.
+Without these, our "deep" network would be no better than simple logistic regression.
+
+3. What happens when learning rate is too high or too low?
+The learning rate controls how big of a step the optimizer takes when updating weights after each batch.
+
+When learning rate is TOO HIGH (e.g., 0.1 or higher):
+
+The model takes large jumps during optimization
+It may overshoot the optimal solution and bounce around
+Loss might oscillate wildly or even increase (diverge)
+The model fails to converge to a good solution
+Like trying to park a car by flooring the accelerator — you'll keep overshooting
+When learning rate is TOO LOW (e.g., 0.00001):
+
+The model takes tiny steps, learning very slowly
+Training takes much longer (needs many more epochs)
+May get stuck in local minima (a "good enough" but not optimal solution)
+Might not converge within the allowed epochs
+Like walking to a destination one centimeter at a time — you'll get there eventually, but it takes forever
+What I observed in my experiments:
+
+Exp 3 (LR = 0.01, higher): Achieved the best AUC-ROC (0.8706) — the faster learning helped explore the loss landscape better
+Exp 5 (LR = 0.0001, lower): Needed all 200 epochs to converge, BUT had the least overfitting and lowest test loss (0.0703) — the careful learning generalized better
+Exp 1 (LR = 0.001, default): A good middle ground that converged in 81 epochs
+The ideal learning rate is a balance — fast enough to converge in reasonable time, but slow enough to find a good minimum.
+
+4. Did your model show signs of underfitting or overfitting? Explain.
+My model showed clear signs of OVERFITTING. Here's the evidence:
+
+Indicator,Training,Testing,What it tells us
+Accuracy,100.00%,97.50%,Model memorized training data
+Loss,0.000479,0.192038,Test loss is ~400x higher!
+Churn Detection,Perfect on train,0% recall on test,Didn't generalize
+
+Accuracy	100.00%	97.50%	...
+Loss	0.000479	0.192038	...
+Churn Detection	Perfect on train	0% recall on test	...
+View more
+Why this is overfitting (not underfitting):
+
+Overfitting = model learns training data TOO well (including noise), but fails on new data. The huge gap between training performance (perfect) and testing performance (poor on minority class) is the classic sign.
+
+Underfitting would mean the model performs poorly on BOTH training and testing data — that's not our case since training accuracy is 100%.
+
+What caused the overfitting:
+
+Extreme class imbalance (98.45% vs 1.55%) — the model found it "easier" to just memorize that almost everyone doesn't churn
+Small dataset (only 2,000 samples with just 31 churners) — not enough churn examples to learn meaningful patterns
+No regularization — we didn't use dropout or L2 regularization to prevent memorization
+Too many parameters (3,713) relative to the number of minority class samples (25 in training)
+How I could fix this in future:
+
+Add Dropout layers (randomly disable neurons during training)
+Use L2 regularization (penalize large weights)
+Apply SMOTE to create synthetic churn samples
+Use class weights to penalize missing churners more heavily
+Reduce model complexity (fewer neurons/layers)
+Collect more data, especially more churn examples
+Summary
+This project taught me that building a neural network isn't just about getting high accuracy — it's about understanding what the numbers actually mean. A 97.50% accuracy sounds impressive, but when your model can't detect a single churner, it's practically useless for the business problem. The real learning was understanding how hyperparameters interact, why class imbalance matters, and that evaluation metrics must match the business goal.
+
